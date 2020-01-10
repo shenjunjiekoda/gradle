@@ -921,10 +921,10 @@ public class NodeState implements DependencyGraphNode {
         removeOutgoingEdges(null);
     }
 
-    private void removeOutgoingEdges(EdgeState edgeToKeep) {
+    private void removeOutgoingEdges(EdgeState edgeAlreadyCleaned) {
         if (!outgoingEdges.isEmpty()) {
             for (EdgeState outgoingDependency : outgoingEdges) {
-                if (outgoingDependency == edgeToKeep) {
+                if (outgoingDependency == edgeAlreadyCleaned) {
                     continue;
                 }
                 if (outgoingDependency.getTargetComponent() == getComponent()) {
@@ -987,20 +987,22 @@ public class NodeState implements DependencyGraphNode {
     private void reselectEndorsingNode() {
         if (incomingEdges.size() == 1) {
             if (incomingEdges.get(0).getDependencyState().getDependency().isEndorsingStrictVersions()) {
+                // do not clean up this not again, otherwise we can end up in a cycle
                 incomingEdges.get(0).getFrom().reselect(incomingEdges.get(0));
             }
         } else {
             for (EdgeState incoming : Lists.newArrayList(incomingEdges)) {
                 if (incoming.getDependencyState().getDependency().isEndorsingStrictVersions()) {
+                    // do not clean up this not again, otherwise we can end up in a cycle
                     incoming.getFrom().reselect(incoming);
                 }
             }
         }
     }
 
-    private void reselect(EdgeState edgeToKeep) {
+    private void reselect(EdgeState edgeAlreadyCleaned) {
         resolveState.onMoreSelected(this);
-        removeOutgoingEdges(edgeToKeep);
+        removeOutgoingEdges(edgeAlreadyCleaned);
     }
 
     void prepareForConstraintNoLongerPending(ModuleIdentifier moduleIdentifier) {
