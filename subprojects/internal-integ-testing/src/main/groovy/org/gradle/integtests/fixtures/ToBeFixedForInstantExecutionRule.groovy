@@ -36,7 +36,7 @@ class ToBeFixedForInstantExecutionRule implements TestRule {
         }
         if (isAllBottomSpecs(annotation) || annotation.bottomSpecs().any { description.className.endsWith(".$it") }) {
             ToBeFixedForInstantExecution.Skip skip = annotation.skip()
-            if (skip == ToBeFixedForInstantExecution.Skip.DO_NOT_SKIP) {
+            if (skip == ToBeFixedForInstantExecution.Skip.DO_NOT_SKIP || skip == ToBeFixedForInstantExecution.Skip.FAILS_TO_CLEANUP) {
                 return new ExpectingFailureRuleStatement(base)
             } else {
                 return new UnsupportedWithInstantExecutionRule.SkippingRuleStatement(base)
